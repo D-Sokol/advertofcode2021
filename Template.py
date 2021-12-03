@@ -5,11 +5,15 @@ import fileinput
 EASY = True
 DAY = 1
 
-result = None
-
+data = []
 for line in fileinput.input(f'{DAY}.txt'):
-    # Some computations here
-    pass
+    line = line.strip()
+    # line = int(line)
+    data.append(line)
 
+
+# Some computations
+result = len(data)
 
 print(result)
+
