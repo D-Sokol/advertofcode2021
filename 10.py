@@ -9,7 +9,7 @@ DAY = 10
 
 INPUT_FILE = f'{DAY}{"t" if TEST else ""}.txt'
 
-bracket_pairs = {
+BRACKET_PAIRS = {
     ']': '[',
     '}': '{',
     ')': '(',
@@ -35,7 +35,7 @@ for line in fileinput.input(INPUT_FILE):
     line = line.strip()
     stack = []
     for char in line:
-        pair = bracket_pairs.get(char)
+        pair = BRACKET_PAIRS.get(char)
         if pair is None:
             # This is either opening bracket or unexpected char, which is not expected
             stack.append(char)
