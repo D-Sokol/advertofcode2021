@@ -51,17 +51,17 @@ if EASY:
 else:
     basin_sizes = []
     current_basin = []
-    for i in range(len(data)):
-        for j in range(len(data[0])):
-            if data[i][j] == 9:
+    for i0 in range(n):
+        for j0 in range(m):
+            if data[i0][j0] == 9:
                 continue
-            current_basin = [(i, j)]
-            data[i][j] = 9
-            for il, jl in current_basin:
-                for iln, jln in iter_neighbors(il, jl):
-                    if is_available(data, iln, jln):
-                        current_basin.append((iln, jln))
-                        data[iln][jln] = 9
+            current_basin = [(i0, j0)]
+            data[i0][j0] = 9
+            for i, j in current_basin:
+                for i_n, j_n in iter_neighbors(i, j):
+                    if is_available(data, i_n, j_n):
+                        current_basin.append((i_n, j_n))
+                        data[i_n][j_n] = 9
             basin_sizes.append(len(current_basin))
 
     basin_sizes.sort()
