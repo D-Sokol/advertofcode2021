@@ -39,7 +39,7 @@ for line in fileinput.input(INPUT_FILE):
 
 result = sum(
     n_lines > 1
-    for point, n_lines in covers.items()
+    for n_lines in covers.values()
 )
 
 print(result)
