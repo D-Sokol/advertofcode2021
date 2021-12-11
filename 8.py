@@ -11,7 +11,8 @@ DAY = 8
 INPUT_FILE = f'{DAY}{"t" if TEST else ""}.txt'
 
 
-LITERALS = [
+ALL_SEGMENTS = "abcdefg"
+DIGIT_TO_SEGMENTS = [
     "abcefg",  # 0
     "cf",      # 1
     "acdeg",   # 2
@@ -23,22 +24,24 @@ LITERALS = [
     "abcdefg", # 8
     "abcdfg",  # 9
 ]
-LITERALS_INVERTED = {lit: dig for dig, lit in enumerate(LITERALS)}
-SEGMENTS = "abcdefg"
+SEGMENTS_TO_DIGIT = {lit: dig for dig, lit in enumerate(DIGIT_TO_SEGMENTS)}
 
-SEARCHED_DIGITS = [1, 4, 7, 8]
-SEARCHED_PATTERNS = [set(LITERALS[digit]) for digit in SEARCHED_DIGITS]
-
-SEGMENTS_ACTIVATIONS = {
-    seg: sorted(len(literal) for literal in LITERALS if seg in literal)
-    for seg in SEGMENTS
+SEGMENT_TO_SIGNATURE = {
+    seg: sorted(len(literal) for literal in DIGIT_TO_SEGMENTS if seg in literal)
+    for seg in ALL_SEGMENTS
 }
 # Segment "e" presented in digits 0 (6 segments), 2 (5 s.), 6 (6 s.) and 8 (7 s.)
-# So, expected value is sorted(6,5,6,7) == [5,6,6,7]
+# Therefore the SIGNATURE of "e" is sorted(6,5,6,7) == [5,6,6,7]
 # This signatures are unique for every segment.
-assert SEGMENTS_ACTIVATIONS["e"] == [5,6,6,7]
-SEGMENTS_INVERTED = {tuple(v): k for k, v in SEGMENTS_ACTIVATIONS.items()}
-assert len(SEGMENTS_INVERTED) == len(SEGMENTS_ACTIVATIONS), "Signatures are not unique, this approach does not work."
+assert SEGMENT_TO_SIGNATURE["e"] == [5,6,6,7]
+SIGNATURE_TO_SEGMENT = {tuple(v): k for k, v in SEGMENT_TO_SIGNATURE.items()}
+
+assert len(SIGNATURE_TO_SEGMENT) == len(SEGMENT_TO_SIGNATURE), "Signatures are not unique, this approach does not work."
+
+
+SEARCHED_DIGITS = [1, 4, 7, 8]
+SEARCHED_PATTERNS = [set(DIGIT_TO_SEGMENTS[digit]) for digit in SEARCHED_DIGITS]
+
 
 result = 0
 for line in fileinput.input(INPUT_FILE):
@@ -52,7 +55,7 @@ for line in fileinput.input(INPUT_FILE):
             segments_frequencies[seg].append(len(digit_repr))
 
     encoding = {
-        seg: SEGMENTS_INVERTED[tuple(sorted(freqs))]
+        seg: SIGNATURE_TO_SEGMENT[tuple(sorted(freqs))]
         for seg, freqs in segments_frequencies.items()
     }
 
@@ -65,7 +68,7 @@ for line in fileinput.input(INPUT_FILE):
         number = 0
         for digit in test:
             encoded_digit = sorted(encoding[seg] for seg in digit)
-            number = 10 * number + LITERALS_INVERTED[''.join(encoded_digit)]
+            number = 10 * number + SEGMENTS_TO_DIGIT[''.join(encoded_digit)]
         result += number
 
 print(result)
