@@ -23,6 +23,10 @@ n, m = len(data), len(data[0])
 
 
 def increase_energy(data, i, j) -> int:
+    """
+    Increases energy of octopus in position (i,j) by 1 and handles all flashes caused.
+    Returns total number of flashes.
+    """
     if i < 0 or j < 0:
         return 0
     try:
@@ -38,6 +42,10 @@ def increase_energy(data, i, j) -> int:
 
 
 def flash(data, i, j) -> int:
+    """
+    Handles flash of the octopus in position (i, j) and handles increasing energy of all adjacent ones.
+    Returns total number of flashes caused.
+    """
     data[i][j] = 0
     flashes = 1
     for i2 in range(i-1, i+2):
