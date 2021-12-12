@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from collections import Counter, defaultdict
 import fileinput
-from typing import List, Dict, Generator
+from typing import List, Dict, Iterator
 
 # If True, this script solves the first part of the puzzle, the second one otherwise.
 EASY = False
@@ -52,7 +52,7 @@ class Path:
         return "Path({})".format(self.path)
 
 
-def add_step(prefix: Path, graph: Dict[str, List[str]], target=END) -> Generator[Path, None, None]:
+def add_step(prefix: Path, graph: Dict[str, List[str]], target=END) -> Iterator[Path]:
     for next_cave in graph[prefix.last_cave()]:
         if not prefix.can_add(next_cave):
             continue
