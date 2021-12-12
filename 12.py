@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from collections import Counter, defaultdict
 import fileinput
-from typing import List, Dict
+from typing import List, Dict, Generator
 
 # If True, this script solves the first part of the puzzle, the second one otherwise.
 EASY = False
@@ -52,21 +52,18 @@ class Path:
         return "Path({})".format(self.path)
 
 
-def add_step(prefix: Path, graph: Dict[str, List[str]], target=END) -> List[Path]:
-    path_list = []
+def add_step(prefix: Path, graph: Dict[str, List[str]], target=END) -> Generator[Path, None, None]:
     for next_cave in graph[prefix.last_cave()]:
         if not prefix.can_add(next_cave):
             continue
 
         path = prefix + next_cave
         if next_cave == target:
-            path_list.append(path)
+            yield path
         else:
-            path_list.extend(add_step(path, graph, target))
-
-    return path_list
+            yield from add_step(path, graph, target)
 
 
-path_list = add_step(Path.initial(), graph)
+path_list = list(add_step(Path.initial(), graph))
 result = len(path_list)
 print(result)
