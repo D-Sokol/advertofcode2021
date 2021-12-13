@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import fileinput
-from typing import Set, Tuple
+from typing import Literal, Set, Tuple
 
 # If True, this script solves the first part of the puzzle, the second one otherwise.
 EASY = False
@@ -17,7 +17,7 @@ def fold_1d(point: int, value: int) -> int:
     return 2 * value - point
 
 
-def fold(data: Set[Tuple], axis: str, value: int):
+def fold(data: Set[Tuple], axis: Literal['x', 'y'], value: int):
     return {
         (x, fold_1d(y, value)) if axis == 'y' else (fold_1d(x, value), y)
         for x, y in data
