@@ -56,7 +56,7 @@ for step in range(STEPS_TO_SIMULATE):
                 next_pairs_freq[next_pair] += freq
         else:
             next_pairs_freq[pair] += freq
-        pairs_freq = next_pairs_freq
+    pairs_freq = next_pairs_freq
 
 chars_freqs = defaultdict(int)
 for (first, second), freq in pairs_freq.items():
