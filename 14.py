@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 from collections import defaultdict, Counter
 import fileinput
-from typing import Any, Dict, Iterator, List, Optional, Tuple
+from typing import Any, Dict, Iterator, List, Optional, Tuple, TypeVar
 
 try:
     # Available in version 3.10, see https://docs.python.org/3/library/itertools.html#itertools.pairwise
     from itertools import pairwise
 except ImportError:
     from itertools import tee
-    # TODO: specify some class variable instead of Any
-    def pairwise(iterable: Iterator[Any]) -> Iterator[Tuple[Any, Any]]:
+    T = TypeVar('T')
+    def pairwise(iterable: Iterator[T]) -> Iterator[Tuple[T, T]]:
         # pairwise('ABCDEFG') --> AB BC CD DE EF FG
         a, b = tee(iterable)
         next(b, None)
@@ -36,6 +36,9 @@ for line in fileinput.input(INPUT_FILE):
     if not line:
         continue
     elif len(line) == 1:
+        # Polymer template.
+        # It is expected that this section runs only one time.
+        assert first_char is None and last_char is None
         first_char, last_char = line[0][0], line[0][-1]
         for pair in pairwise(line[0]):
             pairs_freq[pair] += 1
@@ -43,9 +46,11 @@ for line in fileinput.input(INPUT_FILE):
         # Add new rule
         assert len(line) == 3 and line[1] == '->'
         assert line[0] not in rules
-        rules[tuple(line[0])] = [(line[0][0], line[2]), (line[2], line[0][1])]
+        pair, _, inserted = line
+        rules[tuple(pair)] = [(pair[0], inserted), (inserted, pair[1])]
 
 assert first_char and last_char
+assert len(first_char) == len(last_char) == 1
 
 for step in range(STEPS_TO_SIMULATE):
     next_pairs_freq = defaultdict(int)
