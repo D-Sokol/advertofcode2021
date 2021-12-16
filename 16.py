@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import fileinput
 from functools import reduce
@@ -32,20 +33,41 @@ LOGIC_PACKETS_FUNC = {
 
 
 @dataclass
-class BasePacket:
+class BasePacket(ABC):
     version: int
     type_id: int
     bit_length: int
+
+    @abstractmethod
+    def evaluate(self) -> int:
+        raise NotImplementedError
 
 
 @dataclass
 class ValuePacket(BasePacket):
     value: int
 
+    def evaluate(self) -> int:
+        return self.value if not EASY else self.version
+
 
 @dataclass
 class OperatorPacket(BasePacket):
     subpackets: List[BasePacket]
+
+    def evaluate(self) -> int:
+        if EASY:
+            return self.version + sum(subpacket.evaluate() for subpacket in self.subpackets)
+
+        if self.type_id in REDUCE_PACKETS_FUNC:
+            func = REDUCE_PACKETS_FUNC[self.type_id]
+            return func(subpacket.evaluate() for subpacket in self.subpackets)
+        elif self.type_id in LOGIC_PACKETS_FUNC:
+            subp1, subp2 = self.subpackets
+            op = LOGIC_PACKETS_FUNC[self.type_id]
+            return int(op(subp1.evaluate(), subp2.evaluate()))
+        else:
+            raise ValueError("unknown type_id")
 
 
 def pad_zeros(s: str, length=4) -> str:
@@ -92,30 +114,6 @@ def read_packet(istream: BytesIO) -> BasePacket:
         return OperatorPacket(version, type_id, bit_length, subpackets)
 
 
-def fold(packet: BasePacket) -> int:
-    if EASY:
-        version_sum = packet.version
-        if isinstance(packet, OperatorPacket):
-            for subpacket in packet.subpackets:
-                version_sum += fold(subpacket)
-        return version_sum
-    else:
-        if isinstance(packet, ValuePacket):
-            return packet.value
-        assert isinstance(packet, OperatorPacket)
-
-        if packet.type_id in REDUCE_PACKETS_FUNC:
-            func = REDUCE_PACKETS_FUNC[packet.type_id]
-            return func(fold(subpacket) for subpacket in packet.subpackets)
-        elif packet.type_id in LOGIC_PACKETS_FUNC:
-            subp1, subp2 = packet.subpackets
-            op = LOGIC_PACKETS_FUNC[packet.type_id]
-            return int(op(fold(subp1), fold(subp2)))
-        else:
-            raise ValueError("unknown type_id")
-
-
-
 line = None
 for line in fileinput.input(INPUT_FILE):
     # There is only one line in input.
@@ -125,7 +123,7 @@ assert line
 bits = ''.join(pad_zeros(bin(int(hexdigit, base=16))[2:]) for hexdigit in line).encode()
 stream = BytesIO(bits)
 packet = read_packet(stream)
-result = fold(packet)
+result = packet.evaluate()
 
 print(result)
 
