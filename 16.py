@@ -90,7 +90,7 @@ def read_packet(istream: BytesIO) -> BasePacket:
             part = from_bits(istream.read(5))
             bit_length += 5
             incomplete = (part >= 0b10000)
-            value = (value << 4) + (part & 0b1111)
+            value = (value << 4) + (part & 0b01111)
         return ValuePacket(version, type_id, bit_length=bit_length, value=value)
     else:
         length_type_id = from_bits(istream.read(1))
