@@ -124,8 +124,7 @@ for line in fileinput.input(INPUT_FILE):
     cuboid = Cuboid(ranges)
     if EASY:
         cuboid &= ALLOWED_REGION
-    reactor.add_cuboid(cuboid, is_on)   # bug if is_on == False
-    print(len(reactor.cuboids), reactor.volume())
+    reactor.add_cuboid(cuboid, is_on)
 
 print()
 result = reactor.volume()
